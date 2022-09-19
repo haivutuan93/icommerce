@@ -11,6 +11,7 @@ import com.nab.icommerce.repository.CategoryRepository;
 import com.nab.icommerce.repository.ColourRepository;
 import com.nab.icommerce.repository.ProductRepository;
 import com.nab.icommerce.repository.mongodb.ProductInformationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -20,6 +21,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
     private final ProductInformationRepository productInformationRepository;
@@ -42,6 +44,8 @@ public class ProductService {
 
     @Transactional
     public Product addProduct(ProductChangeRequest request) {
+        log.info("Request to add Product with name: {}, brand: {}", request.getName(), request.getBrand());
+
         var product = new Product();
         product.setName(request.getName());
         product.setTitle(request.getTitle());
