@@ -5,11 +5,11 @@ services:
     image: icommerce
     container_name: icommerce
     ports:
-      - 8080:8080
+      - 8081:8081
     networks:
       - icommerce_network
     extra_hosts:
-      - "docker.for.mac.localhost:host-gateway"
+      - "host.docker.internal:host-gateway"
 
 networks:
   icommerce_network:
