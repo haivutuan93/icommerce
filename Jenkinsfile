@@ -20,7 +20,7 @@ node {
 
     //4//
     stage ('Docker push')
-        docker.withRegistry('public.ecr.aws/l6u8w3k1/icommerce', 'ecr:us-east-1:121152775641') {
+        docker.withRegistry('https://public.ecr.aws/l6u8w3k1/icommerce') {
         docker.image('icommerce').push('latest')
     }
 
