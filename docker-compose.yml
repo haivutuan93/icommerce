@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  icommerce:
+    image: icommerce
+    container_name: icommerce
+    ports:
+      - 8080:8080
+    networks:
+      - icommerce_network
+    extra_hosts:
+      - "docker.for.mac.localhost:host-gateway"
+
+networks:
+  icommerce_network:
+    driver: bridge
