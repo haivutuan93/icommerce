@@ -15,13 +15,13 @@ node {
        
    //3// 
     stage ('Docker Build') {
-        docker.build('icommerce')
+        docker.build('demo')
     }
 
     //4//
     stage ('Docker push')
         docker.withRegistry('https://121152775641.dkr.ecr.us-east-1.amazonaws.com', 'ecr:us-east-1:121152775641') {
-        docker.image('icommerce').push('latest')
+        docker.image('demo').push('latest')
     }
 
 }
