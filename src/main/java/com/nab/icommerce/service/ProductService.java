@@ -60,7 +60,7 @@ public class ProductService {
     }
 
     public List<ProductInformation> filterProduct(ProductFilterRequest request){
-        log.info("Filter Product with name: {}, brand: {}, colour:{}, category: {}",
+        log.info("Filter Production with name: {}, brand: {}, colour:{}, category: {}",
                 request.getName(), request.getBrand(), request.getColour(), request.getCategory());
 
         Query query = new Query();
