@@ -39,14 +39,6 @@ public class ProductController {
         log.info("get");
         return ResponseEntity.ok(productService.getAll());
     }
-    @GetMapping("/get2")
-    public ResponseEntity<Brand> getBrand(){
-        log.info("get2");
-        Brand brand = new Brand();
-        brand.setName("brand");
-        brand.setTitle("title");
-        return ResponseEntity.ok(brand);
-    }
 
     @GetMapping("/test")
     public ResponseEntity<String> testProduct(){
