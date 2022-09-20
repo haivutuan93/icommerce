@@ -1,5 +1,8 @@
 package com.nab.icommerce.service;
 
+import com.nab.icommerce.entity.Brand;
+import com.nab.icommerce.entity.Category;
+import com.nab.icommerce.entity.Colour;
 import com.nab.icommerce.entity.Product;
 import com.nab.icommerce.entity.mongodb.ProductInformation;
 import com.nab.icommerce.exception.APIException;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -46,7 +50,7 @@ public class ProductService {
     public Product addProduct(ProductChangeRequest request) {
         log.info("Request to add Product with name: {}, brand: {}", request.getName(), request.getBrand());
 
-        var product = new Product();
+        Product product = new Product();
         product.setName(request.getName());
         product.setTitle(request.getTitle());
         product.setDescription(request.getDescription());
@@ -54,7 +58,7 @@ public class ProductService {
         product.setQuantity(request.getQuantity());
         validateAndSetForeignData(product, request);
 
-        var productSaved = productRepository.save(product);
+        Product productSaved = productRepository.save(product);
         changeProductToMongoDB(productSaved);
         return productSaved;
     }
@@ -65,19 +69,19 @@ public class ProductService {
 
         Query query = new Query();
 
-        if(request.getCategory() != null && !request.getCategory().isBlank()){
+        if(request.getCategory() != null && !request.getCategory().isEmpty()){
             query.addCriteria(Criteria.where("categories").is(request.getCategory()));
         }
 
-        if(request.getName() != null && !request.getName().isBlank()){
+        if(request.getName() != null && !request.getName().isEmpty()){
             query.addCriteria(Criteria.where("name").is(request.getName()));
         }
 
-        if(request.getBrand() != null && !request.getBrand().isBlank()){
+        if(request.getBrand() != null && !request.getBrand().isEmpty()){
             query.addCriteria(Criteria.where("brand").is(request.getBrand()));
         }
 
-        if(request.getColour() != null && !request.getColour().isBlank()){
+        if(request.getColour() != null && !request.getColour().isEmpty()){
             query.addCriteria(Criteria.where("colours").is(request.getColour()));
         }
 
@@ -102,12 +106,12 @@ public class ProductService {
     }
 
     private Product validateAndSetForeignData(Product product, ProductChangeRequest request){
-        var brand = brandRepository.findBrandByName(request.getBrand()).orElseThrow(
+        Brand brand = brandRepository.findBrandByName(request.getBrand()).orElseThrow(
                 () -> new APIException(ErrorConstant.ERR_PARAMETER_NOT_CORRECT, ErrorConstant.ERR_PARAMETER_NOT_CORRECT_MSG));
         product.setBrand(brand);
 
         if(request.getCategories() != null && !request.getCategories().isEmpty()){
-            var categories = categoryRepository.findCategoriesByName(request.getCategories());
+            Set<Category> categories = categoryRepository.findCategoriesByName(request.getCategories());
             if(categories.size() != request.getCategories().size()){
                 throw new APIException(ErrorConstant.ERR_PARAMETER_NOT_CORRECT, ErrorConstant.ERR_PARAMETER_NOT_CORRECT_MSG);
             } else {
@@ -116,7 +120,7 @@ public class ProductService {
         }
 
         if(request.getColours() != null && !request.getColours().isEmpty()){
-            var colours = colourRepository.findColoursByName(request.getColours());
+            Set<Colour> colours = colourRepository.findColoursByName(request.getColours());
             if(colours.size() != request.getColours().size()){
                 throw new APIException(ErrorConstant.ERR_PARAMETER_NOT_CORRECT, ErrorConstant.ERR_PARAMETER_NOT_CORRECT_MSG);
             } else {

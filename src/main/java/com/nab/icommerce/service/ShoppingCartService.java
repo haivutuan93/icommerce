@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.nab.icommerce.exception.ErrorConstant.*;
 import static com.nab.icommerce.util.Constants.*;
@@ -43,12 +44,12 @@ public class ShoppingCartService {
         } else {
             cart = cartRepository.findById(request.getCartId()).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG));
         }
-        var cartProducts = cart.getProducts();
+        List<Product> cartProducts = cart.getProducts();
         if(cartProducts == null){
             cartProducts = new ArrayList<>();
         }
 
-        var product = validateAndGetProduct(request.getProductId());
+        Product product = validateAndGetProduct(request.getProductId());
         product.setQuantity(product.getQuantity() - 1);
 
         cartProducts.add(product);
@@ -58,13 +59,13 @@ public class ShoppingCartService {
 
     @Transactional
     public PurchaseOrder confirmCartAndMakeOrder(CartConfirmRequest request){
-        var cart = cartRepository.findById(request.getCartId()).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG));
+        Cart cart = cartRepository.findById(request.getCartId()).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG));
         if(!CART_STATUS_IN_PROGRESS.equals(cart.getStatus())){
             throw new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG);
         }
         cart.setStatus(CART_STATUS_COMPLETED);
 
-        var order = new PurchaseOrder();
+        PurchaseOrder order = new PurchaseOrder();
         order.setUser(cart.getUser());
         order.setStatus(ORDER_STATUS_IN_PROGRESS);
         order.setCart(cart);
@@ -72,7 +73,7 @@ public class ShoppingCartService {
     }
 
     private Product validateAndGetProduct(Long productId){
-        var product = productRepository.findById(productId).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG));
+        Product product = productRepository.findById(productId).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG));
 
         if(product.getQuantity() != null && product.getQuantity() <= 0){
             throw new APIException(ERR_PRODUCT_QUANTITY_IS_NOT_ENOUGH, ERR_PRODUCT_QUANTITY_IS_NOT_ENOUGH_MSG);

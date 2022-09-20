@@ -28,12 +28,4 @@ public class ProductInformation {
     @Indexed
     private Set<String> colours;
 
-//    @Field(name = "created_at")
-//    Timestamp createdAt;
-//    @Field(name = "updated_at")
-//    Timestamp updatedAt;
-//    @Field(name = "created_by")
-//    String createdBy;
-//    @Field(name = "updated_by")
-//    String updatedBy;
 }
