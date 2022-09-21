@@ -1,16 +1,16 @@
 package com.nab.icommerce.service;
 
 import com.nab.icommerce.entity.Cart;
-import com.nab.icommerce.entity.PurchaseOrder;
 import com.nab.icommerce.entity.Product;
+import com.nab.icommerce.entity.PurchaseOrder;
 import com.nab.icommerce.exception.APIException;
 import com.nab.icommerce.model.CartAddProductRequest;
 import com.nab.icommerce.model.CartConfirmRequest;
 import com.nab.icommerce.repository.CartRepository;
-import com.nab.icommerce.repository.PurchaseOrderRepository;
 import com.nab.icommerce.repository.ProductRepository;
+import com.nab.icommerce.repository.PurchaseOrderRepository;
 import com.nab.icommerce.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -21,21 +21,23 @@ import static com.nab.icommerce.exception.ErrorConstant.*;
 import static com.nab.icommerce.util.Constants.*;
 
 @Service
+@Slf4j
 public class ShoppingCartService {
-    @Autowired
-    CartRepository cartRepository;
+    private final CartRepository cartRepository;
+    private final PurchaseOrderRepository purchaseOrderRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    PurchaseOrderRepository purchaseOrderRepository;
-
-    @Autowired
-    ProductRepository productRepository;
-
-    @Autowired
-    UserRepository userRepository;
+    public ShoppingCartService(CartRepository cartRepository, PurchaseOrderRepository purchaseOrderRepository, ProductRepository productRepository, UserRepository userRepository) {
+        this.cartRepository = cartRepository;
+        this.purchaseOrderRepository = purchaseOrderRepository;
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
+    }
 
     @Transactional
     public Cart addProductToCart(CartAddProductRequest request, Long userId){
+        log.info("Add product to Cart: productId: {}, cartId: {}", request.getProductId(), request.getCartId());
         Cart cart;
         if(request.getCartId() == null){
             cart = new Cart();
@@ -59,6 +61,7 @@ public class ShoppingCartService {
 
     @Transactional
     public PurchaseOrder confirmCartAndMakeOrder(CartConfirmRequest request){
+        log.info("Confirm cart to make new order for cartId:{}", request.getCartId());
         Cart cart = cartRepository.findById(request.getCartId()).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG));
         if(!CART_STATUS_IN_PROGRESS.equals(cart.getStatus())){
             throw new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG);

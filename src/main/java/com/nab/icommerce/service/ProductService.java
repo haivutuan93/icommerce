@@ -28,7 +28,6 @@ import java.util.Set;
 @Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
-    private final ProductInformationRepository productInformationRepository;
     private final MongoTemplate mongoTemplate;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
@@ -38,7 +37,6 @@ public class ProductService {
     public ProductService(ProductRepository productRepository, ProductInformationRepository productInformationRepository, MongoTemplate mongoTemplate,
                           BrandRepository brandRepository, CategoryRepository categoryRepository, ColourRepository colourRepository, RabbitMQSender rabbitMQSender) {
         this.productRepository = productRepository;
-        this.productInformationRepository = productInformationRepository;
         this.mongoTemplate = mongoTemplate;
         this.brandRepository = brandRepository;
         this.categoryRepository = categoryRepository;
@@ -95,10 +93,6 @@ public class ProductService {
 
         return mongoTemplate.find(query, ProductInformation.class);
 
-    }
-
-    public List<Product> getAll(){
-        return productRepository.findAll();
     }
 
     private void changeProductToMongoDB(Product product){

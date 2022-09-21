@@ -5,7 +5,6 @@ import com.nab.icommerce.entity.PurchaseOrder;
 import com.nab.icommerce.mapper.CartMapper;
 import com.nab.icommerce.model.CartAddProductRequest;
 import com.nab.icommerce.model.CartConfirmRequest;
-import com.nab.icommerce.model.CartResponseModel;
 import com.nab.icommerce.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -20,20 +19,20 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/cart")
 public class ShoppingCartController {
-    @Autowired
-    ShoppingCartService shoppingCartService;
+    private final ShoppingCartService shoppingCartService;
 
-    @Autowired
-    CartMapper cartMapper;
+    public ShoppingCartController(ShoppingCartService shoppingCartService) {
+        this.shoppingCartService = shoppingCartService;
+    }
 
     @PostMapping(value = "/add-product", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CartResponseModel> addProductToCart(@RequestBody @Valid CartAddProductRequest request){
+    public ResponseEntity<Cart> addProductToCart(@RequestBody @Valid CartAddProductRequest request){
         Cart cart = shoppingCartService.addProductToCart(request, request.getUserId());
-        return ResponseEntity.ok(cartMapper.mapToCartResponseModel(cart));
+        return ResponseEntity.ok(cart);
     }
 
     @PostMapping(value = "/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PurchaseOrder confirmCartAndMakeOrder(@RequestBody @Valid CartConfirmRequest request){
-        return shoppingCartService.confirmCartAndMakeOrder(request);
+    public ResponseEntity<PurchaseOrder> confirmCartAndMakeOrder(@RequestBody @Valid CartConfirmRequest request){
+        return ResponseEntity.ok(shoppingCartService.confirmCartAndMakeOrder(request));
     }
 }
