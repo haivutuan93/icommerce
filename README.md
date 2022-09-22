@@ -63,6 +63,7 @@ After that check http://localhost:8761/ to make sure eureka server is up
 
 ## API Docs
 **Note: I run docker containers for Service in AWS Server, if you want to test API in Local please use root url http://localhost:8762 instead http://ec2-3-94-145-92.compute-1.amazonaws.com:8762**
+
 **Postman file**: https://github.com/haivutuan93/icommerce/blob/master/postman/AWS%20EC2.postman_collection.json
 * _API register new User_
 ```sh
