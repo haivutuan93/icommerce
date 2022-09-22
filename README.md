@@ -45,7 +45,25 @@ In iCommerce database, Product is the central of all functions
 * Purchase_Order has to owner by an User, User map 1 to many with Purchase_Order
 * Purchase_Order should has Order_Shipping_Progress for User can check where is your Order in, map between Purchase_Order and Order_Shipping_Progress
 
+## Run Project in Local
+```sh
+git clone https://github.com/haivutuan93/icommerce.git
+
+cd icommerce/run-local
+
+docker build -f DockerfileEureka -t eureka .
+docker build -f DockerfileZuul -t zuul .
+docker build -f DockerfileAuth -t auth .
+docker build -f DockerfileICommerce -t icommerce .
+
+docker compose up -d
+docker ps
+```
+After that check http://localhost:8761/ to make sure eureka server is up
+
 ## API Docs
+**Note: I run docker containers for Service in AWS Server, if you want to test API in Local please use root url http://localhost:8762 instead http://ec2-3-94-145-92.compute-1.amazonaws.com:8762**
+**Postman file**: https://github.com/haivutuan93/icommerce/blob/master/postman/AWS%20EC2.postman_collection.json
 * _API register new User_
 ```sh
 curl --location --request POST 'ec2-3-94-145-92.compute-1.amazonaws.com:8762/auth/register' \
