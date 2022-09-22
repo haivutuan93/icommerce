@@ -46,7 +46,7 @@ public class ProductService {
 
     @Transactional
     public Product addProduct(ProductChangeRequest request) {
-        log.info("Request to add Product with name: {}, brand: {}", request.getName(), request.getBrand());
+        log.info("Request to add Product with name: {}, brand: {}, price: {}", request.getName(), request.getBrand(), request.getPrice());
 
         Product product = new Product();
         product.setName(request.getName());
