@@ -1,5 +1,8 @@
 package com.nab.icommerce.service;
 
+import com.nab.icommerce.entity.Brand;
+import com.nab.icommerce.entity.Category;
+import com.nab.icommerce.entity.Colour;
 import com.nab.icommerce.entity.Product;
 import com.nab.icommerce.entity.mongodb.ProductInformation;
 import com.nab.icommerce.exception.APIException;
@@ -19,12 +22,12 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
-    private final ProductInformationRepository productInformationRepository;
     private final MongoTemplate mongoTemplate;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
@@ -34,7 +37,6 @@ public class ProductService {
     public ProductService(ProductRepository productRepository, ProductInformationRepository productInformationRepository, MongoTemplate mongoTemplate,
                           BrandRepository brandRepository, CategoryRepository categoryRepository, ColourRepository colourRepository, RabbitMQSender rabbitMQSender) {
         this.productRepository = productRepository;
-        this.productInformationRepository = productInformationRepository;
         this.mongoTemplate = mongoTemplate;
         this.brandRepository = brandRepository;
         this.categoryRepository = categoryRepository;
@@ -44,9 +46,9 @@ public class ProductService {
 
     @Transactional
     public Product addProduct(ProductChangeRequest request) {
-        log.info("Request to add Product with name: {}, brand: {}", request.getName(), request.getBrand());
+        log.info("Request to add Product with name: {}, brand: {}, price: {}", request.getName(), request.getBrand(), request.getPrice());
 
-        var product = new Product();
+        Product product = new Product();
         product.setName(request.getName());
         product.setTitle(request.getTitle());
         product.setDescription(request.getDescription());
@@ -54,30 +56,30 @@ public class ProductService {
         product.setQuantity(request.getQuantity());
         validateAndSetForeignData(product, request);
 
-        var productSaved = productRepository.save(product);
+        Product productSaved = productRepository.save(product);
         changeProductToMongoDB(productSaved);
         return productSaved;
     }
 
     public List<ProductInformation> filterProduct(ProductFilterRequest request){
-        log.info("Filter Production with name: {}, brand: {}, colour:{}, category: {}",
+        log.info("Filter Product with name: {}, brand: {}, colour:{}, category: {}",
                 request.getName(), request.getBrand(), request.getColour(), request.getCategory());
 
         Query query = new Query();
 
-        if(request.getCategory() != null && !request.getCategory().isBlank()){
+        if(request.getCategory() != null && !request.getCategory().isEmpty()){
             query.addCriteria(Criteria.where("categories").is(request.getCategory()));
         }
 
-        if(request.getName() != null && !request.getName().isBlank()){
+        if(request.getName() != null && !request.getName().isEmpty()){
             query.addCriteria(Criteria.where("name").is(request.getName()));
         }
 
-        if(request.getBrand() != null && !request.getBrand().isBlank()){
+        if(request.getBrand() != null && !request.getBrand().isEmpty()){
             query.addCriteria(Criteria.where("brand").is(request.getBrand()));
         }
 
-        if(request.getColour() != null && !request.getColour().isBlank()){
+        if(request.getColour() != null && !request.getColour().isEmpty()){
             query.addCriteria(Criteria.where("colours").is(request.getColour()));
         }
 
@@ -93,21 +95,17 @@ public class ProductService {
 
     }
 
-    public List<Product> getAll(){
-        return productRepository.findAll();
-    }
-
     private void changeProductToMongoDB(Product product){
         rabbitMQSender.send(product);
     }
 
     private Product validateAndSetForeignData(Product product, ProductChangeRequest request){
-        var brand = brandRepository.findBrandByName(request.getBrand()).orElseThrow(
+        Brand brand = brandRepository.findBrandByName(request.getBrand()).orElseThrow(
                 () -> new APIException(ErrorConstant.ERR_PARAMETER_NOT_CORRECT, ErrorConstant.ERR_PARAMETER_NOT_CORRECT_MSG));
         product.setBrand(brand);
 
         if(request.getCategories() != null && !request.getCategories().isEmpty()){
-            var categories = categoryRepository.findCategoriesByName(request.getCategories());
+            Set<Category> categories = categoryRepository.findCategoriesByName(request.getCategories());
             if(categories.size() != request.getCategories().size()){
                 throw new APIException(ErrorConstant.ERR_PARAMETER_NOT_CORRECT, ErrorConstant.ERR_PARAMETER_NOT_CORRECT_MSG);
             } else {
@@ -116,7 +114,7 @@ public class ProductService {
         }
 
         if(request.getColours() != null && !request.getColours().isEmpty()){
-            var colours = colourRepository.findColoursByName(request.getColours());
+            Set<Colour> colours = colourRepository.findColoursByName(request.getColours());
             if(colours.size() != request.getColours().size()){
                 throw new APIException(ErrorConstant.ERR_PARAMETER_NOT_CORRECT, ErrorConstant.ERR_PARAMETER_NOT_CORRECT_MSG);
             } else {
