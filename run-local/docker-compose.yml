@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  eureka:
+    image: eureka:latest
+    container_name: eureka
+    ports:
+      - 8761:8761
+    networks:
+      - icomm
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  zuul:
+    image: zuul:latest
+    container_name: zuul
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://host.docker.internal:8761/eureka
+    ports:
+      - 8762:8762
+    networks:
+      - icomm
+
+  auth:
+    image: auth:latest
+    container_name: auth
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://host.docker.internal:8761/eureka
+    ports:
+      - 9100:9100
+    networks:
+      - icomm
+
+  icommerce:
+    image: icommerce:latest
+    container_name: icommerce
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://host.docker.internal:8761/eureka
+    ports:
+      - 8081:8081
+    networks:
+      - icomm
+
+networks:
+  icomm:
+    driver: bridge
