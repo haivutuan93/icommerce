@@ -1,7 +1,7 @@
 # iCommerce
 Project iCommerce i used 2 repositories, 1 for Business Service and 1 for setup MicroServices architecture:
-https://github.com/haivutuan93/icommerce/tree/master
-https://github.com/haivutuan93/micro-service/tree/master
+* https://github.com/haivutuan93/icommerce/tree/master
+* https://github.com/haivutuan93/micro-service/tree/master
 ## Architecture Overview
 This is Architecture Overview Diagram, in here i apply some technology
 
@@ -107,3 +107,4 @@ curl --location --request POST 'http://ec2-3-94-145-92.compute-1.amazonaws.com:8
     "cartId": 3
 }'
 ```
+
