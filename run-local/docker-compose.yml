@@ -15,7 +15,7 @@ services:
     image: zuul:latest
     container_name: zuul
     environment:
-      - eureka.client.serviceUrl.defaultZone = http://localhost:8761/eureka/
+      - eureka.client.serviceUrl.defaultZone=http://host.docker.internal:8761/eureka
     ports:
       - 8762:8762
     networks:
@@ -25,7 +25,7 @@ services:
     image: auth:latest
     container_name: auth
     environment:
-      - eureka.client.serviceUrl.defaultZone = http://localhost:8761/eureka/
+      - eureka.client.serviceUrl.defaultZone=http://host.docker.internal:8761/eureka
     ports:
       - 9100:9100
     networks:
@@ -35,7 +35,7 @@ services:
     image: icommerce:latest
     container_name: icommerce
     environment:
-      - eureka.client.serviceUrl.defaultZone = http://localhost:8761/eureka/
+      - eureka.client.serviceUrl.defaultZone=http://host.docker.internal:8761/eureka
     ports:
       - 8081:8081
     networks:
