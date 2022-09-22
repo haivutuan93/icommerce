@@ -3,6 +3,7 @@ package com.nab.icommerce.service;
 import com.nab.icommerce.entity.Cart;
 import com.nab.icommerce.entity.Product;
 import com.nab.icommerce.entity.PurchaseOrder;
+import com.nab.icommerce.entity.User;
 import com.nab.icommerce.exception.APIException;
 import com.nab.icommerce.model.CartAddProductRequest;
 import com.nab.icommerce.model.CartConfirmRequest;
@@ -36,12 +37,12 @@ public class ShoppingCartService {
     }
 
     @Transactional
-    public Cart addProductToCart(CartAddProductRequest request, Long userId){
-        log.info("Add product to Cart: productId: {}, cartId: {}", request.getProductId(), request.getCartId());
+    public Cart addProductToCart(CartAddProductRequest request, String username){
+        log.info("Add product to Cart: productId: {}, cartId: {}, username: {}", request.getProductId(), request.getCartId(), username);
         Cart cart;
         if(request.getCartId() == null){
             cart = new Cart();
-            cart.setUser(userRepository.findById(userId).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG)));
+            cart.setUser(userRepository.findByUsername(username).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG)));
             cart.setStatus(CART_STATUS_IN_PROGRESS);
         } else {
             cart = cartRepository.findById(request.getCartId()).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG));
@@ -60,9 +61,14 @@ public class ShoppingCartService {
     }
 
     @Transactional
-    public PurchaseOrder confirmCartAndMakeOrder(CartConfirmRequest request){
+    public PurchaseOrder confirmCartAndMakeOrder(CartConfirmRequest request, String username){
         log.info("Confirm cart to make new order for cartId:{}", request.getCartId());
         Cart cart = cartRepository.findById(request.getCartId()).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG));
+        if(!cart.getUser().getId().equals(user.getId())){
+            throw new APIException(ERR_CART_USER_NOT_MATCH, ERR_CART_USER_NOT_MATCH_MSG);
+        }
+
         if(!CART_STATUS_IN_PROGRESS.equals(cart.getStatus())){
             throw new APIException(ERR_PARAMETER_NOT_CORRECT, ERR_PARAMETER_NOT_CORRECT_MSG);
         }
