@@ -6,6 +6,7 @@ Project iCommerce i used 2 repositories, 1 for Business Service and 1 for setup 
 This is Architecture Overview Diagram, in here i apply some technology
 
 * **Spring Boot** and **Spring Cloud Zuul** for handle Microservices Architecture.
+  (Zuul Server: http://ec2-3-94-145-92.compute-1.amazonaws.com:8761/)
 * **Spring Security** for authenticate request
 * **MySql** for store persistence Data, **MongoDB** for filter Product and get detail of Product, request of get Product is a lot so need to have other DB for query, avoid affecting influence on others flow (add Product to Cart, make Order...). Document database like **MongoDB** is the good choice for get and filter
 * **RabbitMQ** for handle event when change information of Product(add, update Product) and send Event to store new data of to **MongoDB**
