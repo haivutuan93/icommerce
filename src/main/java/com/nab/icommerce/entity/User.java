@@ -1,5 +1,6 @@
 package com.nab.icommerce.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ public class User {
     @NotNull
     String username;
     @NotNull
+    @JsonIgnore
     @Column(name = "password_hash")
     String passwordHash;
     @Column(name = "display_name")
