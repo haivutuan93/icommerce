@@ -28,12 +28,14 @@ public class ShoppingCartService {
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final RabbitMQSender rabbitMQSender;
 
-    public ShoppingCartService(CartRepository cartRepository, PurchaseOrderRepository purchaseOrderRepository, ProductRepository productRepository, UserRepository userRepository) {
+    public ShoppingCartService(CartRepository cartRepository, PurchaseOrderRepository purchaseOrderRepository, ProductRepository productRepository, UserRepository userRepository, RabbitMQSender rabbitMQSender) {
         this.cartRepository = cartRepository;
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.rabbitMQSender = rabbitMQSender;
     }
 
     @Transactional
@@ -57,7 +59,10 @@ public class ShoppingCartService {
 
         cartProducts.add(product);
         cart.setAmount(cartProducts.stream().mapToDouble(Product::getPrice).sum());
-        return cartRepository.save(cart);
+        Cart result = cartRepository.save(cart);
+        rabbitMQSender.send(product);
+
+        return result;
     }
 
     @Transactional
